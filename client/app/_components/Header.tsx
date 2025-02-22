@@ -20,7 +20,10 @@ function Header() {
 
   return (
     <div className="p-5 flex justify-between items-center border shadow-sm">
-      <Image src={"./logo.png"} alt="logo" width={70} height={70} />
+      <div className="flex items-centergap-1">
+        <Image src={"/logo.png"} alt="logo" width={30} height={30} />
+        <p className="font-semibold text-base text-green-950"> POCKETIER </p>
+      </div>
       {isSignedIn ? (
         <UserButton />
       ) : (

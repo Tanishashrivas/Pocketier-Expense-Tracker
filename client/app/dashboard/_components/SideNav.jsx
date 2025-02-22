@@ -39,7 +39,10 @@ function SideNav({ isSideNavOpen, onClose }) {
   return (
     <div className="h-screen p-5 border shadow-sm bg-white">
       <div className="flex justify-between items-center">
-        <Image src={"/logo.png"} alt="logo" width={70} height={70} />
+        <div className="flex items-center gap-1">
+          <Image src={"/logo.png"} alt="logo" width={30} height={30} />
+          <p className="font-semibold text-base text-green-950"> POCKETIER </p>
+        </div>
         <button className="md:hidden p-2" onClick={onClose}>
           <X />
         </button>

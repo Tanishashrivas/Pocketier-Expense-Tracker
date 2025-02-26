@@ -1,29 +1,29 @@
 "use client";
-import { PenBox } from "lucide-react";
-import React, { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "../../../../../components/ui/dialog";
-import { Button } from "../../../../../components/ui/button";
-import { Input } from "../../../../../components/ui/input";
-import EmojiPicker from "emoji-picker-react";
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
-// import { db } from "../../../../../utils/dbConfig";
-// import { Budgets } from "../../../../../utils/schema";
-// import { eq } from "drizzle-orm";
+import EmojiPicker from "emoji-picker-react";
+import { PenBox } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { updateBudget } from "../../budgets/_hooks/updateBudget";
+
 function EditBudget({ budgetInfo, refreshData }) {
   const [emojiIcon, setEmojiIcon] = useState(budgetInfo?.icon);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
-  const [name, setName] = useState();
-  const [amount, setAmount] = useState();
+  const [name, setName] = useState<string>("");
+  const [amount, setAmount] = useState<number | undefined>(undefined);
   const { user } = useUser();
 
   useEffect(() => {
@@ -34,7 +34,16 @@ function EditBudget({ budgetInfo, refreshData }) {
     }
   }, [budgetInfo]);
 
-  const onUpdateBudget = async () => {};
+  const onUpdateBudget = async () => {
+    const updatedPayload = { ...budgetInfo, name: name, totalAmount: amount };
+
+    const response = await updateBudget(budgetInfo.id, updatedPayload);
+    console.log(response);
+    if (response) {
+      refreshData();
+      toast("Budget Updated");
+    }
+  };
 
   return (
     <div>
@@ -60,7 +69,8 @@ function EditBudget({ budgetInfo, refreshData }) {
                   <EmojiPicker
                     open={openEmojiPicker}
                     onEmojiClick={(e) => {
-                      setEmojiIcon(e.emoji), setOpenEmojiPicker(false);
+                      setEmojiIcon(e.emoji);
+                      setOpenEmojiPicker(false);
                     }}
                   />
                 </div>
@@ -77,8 +87,8 @@ function EditBudget({ budgetInfo, refreshData }) {
                   <Input
                     defaultValue={budgetInfo?.amount}
                     type="number"
-                    placeholder="e.g. 5000$"
-                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="e.g. 500$"
+                    onChange={(e) => setAmount(Number(e.target.value))}
                   />
                 </div>
               </div>

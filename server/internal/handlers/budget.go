@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tanishashrivas/pocketier-expense-tracker/server/config"
@@ -32,11 +33,42 @@ func GetBudgetById(c *gin.Context) {
 }
 
 func CreateBudget(c *gin.Context) {
-	var newBudget models.Budget
+	var reqBody struct {
+		Name        string  `json:"name"`
+		TotalAmount float64 `json:"totalAmount"`
+		StartDate   string  `json:"startDate"`
+		EndDate     string  `json:"endDate"`
+		UserID      string  `json:"userId"`
+	}
 
-	if err := c.ShouldBindJSON(&newBudget); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&reqBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
+	}
+
+	var user models.User
+	if err := config.DB.Where("clerk_id = ?", reqBody.UserID).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+		return
+	}
+
+	startDate, err := time.Parse(time.RFC3339, reqBody.StartDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start date format"})
+		return
+	}
+	endDate, err := time.Parse(time.RFC3339, reqBody.EndDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end date format"})
+		return
+	}
+
+	newBudget := models.Budget{
+		Name:        reqBody.Name,
+		TotalAmount: reqBody.TotalAmount,
+		StartDate:   startDate,
+		EndDate:     endDate,
+		UserID:      user.ID,
 	}
 
 	if err := config.DB.Create(&newBudget).Error; err != nil {
@@ -44,7 +76,7 @@ func CreateBudget(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Budget created successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "Budget created successfully", "budget": newBudget})
 }
 
 func EditBudget(c *gin.Context) {

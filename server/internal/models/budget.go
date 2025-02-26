@@ -7,14 +7,11 @@ import (
 )
 
 type Budget struct {
-	// ID          uint    `gorm:"primaryKey"`
 	gorm.Model
-	Name        string  `gorm:"not null"`
-	TotalAmount float64 `gorm:"not null"`
-	StartDate   time.Time
-	EndDate     time.Time
-	UserID      uint      `gorm:"not null"`
-	Expenses    []Expense `gorm:"foreignKey:BudgetID"`
-	// CreatedAt   time.Time
-	// UpdatedAt   time.Time
+	Name        string    `gorm:"not null" json:"name"`
+	TotalAmount float64   `gorm:"not null" json:"totalAmount"`
+	StartDate   time.Time `json:"startDate"`
+	EndDate     time.Time `json:"endDate"`
+	UserID      uint      `gorm:"not null" json:"userId"`
+	Expenses    []Expense `gorm:"foreignKey:BudgetID" json:"expenses"`
 }

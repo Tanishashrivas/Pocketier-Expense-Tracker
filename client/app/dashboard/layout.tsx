@@ -1,23 +1,27 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import SideNav from "./_components/SideNav";
-import DashboardHeader from "./_components/DashboardHeader";
-// import { db } from "../../../utils/dbConfig";
-// import { Budgets } from "../../../utils/schema";
-import { useUser } from "@clerk/nextjs";
-// import { eq } from "drizzle-orm";
-import { useRouter } from "next/navigation";
 
-function DashboardLayout({ children }) {
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import DashboardHeader from "./_components/DashboardHeader";
+import SideNav from "./_components/SideNav";
+import { getBudgets } from "./_hooks/getBudgets";
+
+function DashboardLayout({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const router = useRouter();
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
 
   useEffect(() => {
-    user && checkUserBudgets();
+    if (user) checkUserBudgets();
   }, [user]);
 
-  const checkUserBudgets = async () => {};
+  const checkUserBudgets = async () => {
+    const response = await getBudgets();
+    if (response?.data?.length == 0) {
+      router.push("/dashboard/budgets");
+    }
+  };
 
   const toggleSideNav = () => {
     setIsSideNavOpen(!isSideNavOpen);

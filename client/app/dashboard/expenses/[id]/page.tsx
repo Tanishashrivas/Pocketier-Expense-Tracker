@@ -1,16 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
-// import { db } from "../../../../../utils/dbConfig";
-// import { Budgets, expenses } from "../../../../../utils/schema";
-// import { getTableColumns, sql, desc, eq } from "drizzle-orm";
-import { useUser } from "@clerk/nextjs";
 
-import { Pen, PenBox, Trash } from "lucide-react";
-import BudgetItem from "../../budgets/_components/BudgetItem";
-import AddExpense from "../_components/AddExpense";
-import ExpenseListTable from "../_components/ExpenseListTable";
-import EditBudget from "../_components/EditBudget";
-import { Button } from "../../../../../components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,26 +10,47 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../../../../components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
+import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { getExpenses } from "../../_hooks/getExpenses";
+import BudgetItem from "../../budgets/_components/BudgetItem";
+import { deleteBudget } from "../../budgets/_hooks/deleteBudget";
+import { getBudgetById } from "../../budgets/_hooks/getBudgetById";
+import AddExpense from "../_components/AddExpense";
+import EditBudget from "../_components/EditBudget";
+import ExpenseListTable from "../_components/ExpenseListTable";
 
 function ExpensesScreen({ params }) {
   const { user } = useUser();
 
   const [budgetInfo, setBudgetInfo] = useState(null);
   const [expensesList, setExpensesList] = useState([]);
-  const route = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
-    user && getBudgetInfo();
+    if (user) getBudgetInfo();
   }, [user]);
 
-  const getBudgetInfo = async () => {};
+  const getBudgetInfo = async () => {
+    const response = await getBudgetById(params.id);
+    setBudgetInfo(response.data);
+  };
 
-  const getExpensesList = async () => {};
+  const getExpensesList = async () => {
+    const response = await getExpenses();
+    setExpensesList(response.data);
+  };
 
-  const deleteBudget = async () => {};
+  const handleDeleteBudget = async (id: string) => {
+    await deleteBudget(id);
+    toast("Budget Deleted!");
+    router.replace("/dashboard/budgets");
+  };
 
   return (
     <div className="p-10">
@@ -53,7 +63,7 @@ function ExpensesScreen({ params }) {
           />
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" classname="flex gap-2">
+              <Button variant="destructive" className="flex gap-2">
                 <Trash /> Delete
               </Button>
             </AlertDialogTrigger>
@@ -68,7 +78,9 @@ function ExpensesScreen({ params }) {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => deleteBudget()}>
+                <AlertDialogAction
+                  onClick={() => handleDeleteBudget(params.id)}
+                >
                   Continue
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -83,11 +95,7 @@ function ExpensesScreen({ params }) {
         ) : (
           <div className="w-full h-[150px] bg-slate-200 rounded-lg animate-pulse "></div>
         )}
-        <AddExpense
-          budgetId={params.id}
-          user={user}
-          refreshData={() => getBudgetInfo()}
-        />
+        <AddExpense budgetId={params.id} refreshData={() => getBudgetInfo()} />
       </div>
       <div className="mt-4">
         <h2 className="font-bold text-lg">Latest Expenses</h2>

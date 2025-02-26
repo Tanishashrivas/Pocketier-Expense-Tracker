@@ -4,13 +4,11 @@ import {
   LayoutGrid,
   PiggyBank,
   ReceiptText,
-  ShieldCheck,
+  RussianRuble,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
 
 function SideNav({ isSideNavOpen, onClose }) {
   const menuList = [
@@ -40,8 +38,12 @@ function SideNav({ isSideNavOpen, onClose }) {
     <div className="h-screen p-5 border shadow-sm bg-white">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-1">
-          <Image src={"/logo.png"} alt="logo" width={30} height={30} />
-          <p className="font-semibold text-base text-green-950"> POCKETIER </p>
+          {/* <Image src={"/logo.png"} alt="logo" width={30} height={30} /> */}
+          <RussianRuble className="text-green-950" />
+          <p className="font-semibold text-base text-green-950 tracking-wide">
+            {" "}
+            POCKETIER{" "}
+          </p>
         </div>
         <button className="md:hidden p-2" onClick={onClose}>
           <X />
@@ -49,7 +51,7 @@ function SideNav({ isSideNavOpen, onClose }) {
       </div>
 
       <div className="mt-5">
-        {menuList.map((menu) => (
+        {menuList?.map((menu) => (
           <Link href={menu.path} key={menu.id} onClick={onClose}>
             <h2
               className={`flex gap-2 text-gray-500 items-center font-medium mb-2 p-5 cursor-pointer rounded-md hover:text-primary hover:bg-blue-100 ${

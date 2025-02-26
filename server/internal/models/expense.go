@@ -7,14 +7,11 @@ import (
 )
 
 type Expense struct {
-	// ID          uint      `gorm:"primaryKey"`
 	gorm.Model
-	Description string    `gorm:"not null"`
-	Amount      float64   `gorm:"not null"`
-	Date        time.Time `gorm:"not null"`
-	Category    string
-	BudgetID    *uint
-	UserID      uint `gorm:"not null"`
-	// CreatedAt   time.Time
-	// UpdatedAt   time.Time
+	Description string    `gorm:"not null" json:"description"`
+	Amount      float64   `gorm:"not null" json:"amount"`
+	Date        time.Time `gorm:"not null" json:"date"`
+	Category    string    `json:"category"`
+	BudgetID    *uint     `json:"budgetId"`
+	UserID      uint      `gorm:"not null" json:"userId"`
 }

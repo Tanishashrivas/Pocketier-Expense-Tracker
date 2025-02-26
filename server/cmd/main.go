@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -11,6 +12,10 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	db.Connect()
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -32,6 +37,6 @@ func main() {
 	routes.ExpenseRoutes(api)
 	routes.UserRoutes(api)
 
-	r.Run(":8080")
+	r.Run(":" + port)
 	log.Println("Application started successfully!")
 }

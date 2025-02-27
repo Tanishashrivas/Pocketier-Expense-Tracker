@@ -13,9 +13,14 @@ import (
 
 func main() {
 	port := os.Getenv("PORT")
+
 	if port == "" {
+		log.Println("PORT environment variable not set, using default 8080")
 		port = "8080"
+	} else {
+		log.Printf("PORT found: %s\n", port)
 	}
+
 	db.Connect()
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{

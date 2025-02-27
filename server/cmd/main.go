@@ -47,6 +47,6 @@ func main() {
 	routes.ExpenseRoutes(api)
 	routes.UserRoutes(api)
 
-	r.Run(":" + port)
+	r.Run("0.0.0.0:" + port)
 	log.Println("Application started successfully!")
 }

@@ -28,13 +28,11 @@ func main() {
 	}
 
 	port := os.Getenv("PORT")
-
 	if port == "" {
-		log.Println("PORT environment variable not set, using default 8080")
-		port = "8080"
-	} else {
-		log.Printf("PORT found: %s\n", port)
+		log.Fatal("❌ PORT environment variable not set! Render will fail.")
 	}
+
+	log.Printf("✅ Running on PORT: %s\n", port)
 
 	db.Connect()
 	r := gin.Default()
@@ -57,6 +55,8 @@ func main() {
 	routes.ExpenseRoutes(api)
 	routes.UserRoutes(api)
 
-	r.Run("0.0.0.0:" + port)
-	log.Println("Application started successfully!")
+	log.Printf("🌍 Server starting on port: %s\n", port)
+	log.Println("🔥 If this is missing in logs, Render is not setting the PORT variable!")
+
+	r.Run(":" + port)
 }

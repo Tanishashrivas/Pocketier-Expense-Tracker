@@ -32,15 +32,15 @@ function CardInfo({ budgetList }: { budgetList: Budget[] }) {
   const [totalSpend, setTotalSpend] = useState(0);
 
   useEffect(() => {
+    const CalculateCardInfo = () => {
+      const data = CalculateTotalAmountandSpend(budgetList);
+
+      setTotalBudget(data.totalBudget);
+      setTotalSpend(data.totalSpend);
+    };
+
     if (budgetList) CalculateCardInfo();
   }, [budgetList]);
-
-  const CalculateCardInfo = () => {
-    const data = CalculateTotalAmountandSpend(budgetList);
-
-    setTotalBudget(data.totalBudget);
-    setTotalSpend(data.totalSpend);
-  };
 
   return (
     <div>

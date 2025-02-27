@@ -29,7 +29,7 @@ function BudgetList() {
         <CreateBudget refreshData={() => getBudgetList()} />
         {budgetList?.length > 0 &&
           budgetList.map((budget) => (
-            <BudgetItem key={budget.id} budget={budget} />
+            <BudgetItem key={budget.ID} budget={budget} />
           ))}
       </div>
     </div>

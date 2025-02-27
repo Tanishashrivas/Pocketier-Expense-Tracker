@@ -50,10 +50,10 @@ function AddExpense({ budgetId, refreshData }: IAddExpenseProps) {
   });
   const [error, setError] = useState("");
 
-  const handleChange = (e) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const onAddExpense = async (e) => {
+  const onAddExpense = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formData.category || !formData.amount || !formData.date) {
       setError("All fields are required.");

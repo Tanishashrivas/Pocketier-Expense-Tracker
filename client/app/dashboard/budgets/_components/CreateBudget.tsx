@@ -33,7 +33,7 @@ export interface IBudgetForm {
   dateRange: { from: Date | null; to: Date | null };
 }
 
-function CreateBudget({ refreshData }) {
+function CreateBudget({ refreshData }: { refreshData: () => void }) {
   const { user } = useUser();
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
@@ -46,10 +46,10 @@ function CreateBudget({ refreshData }) {
     },
   });
   const [error, setError] = useState("");
-  const handleChange = (e) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const onCreateBudget = async (e) => {
+  const onCreateBudget = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (
       Object.values(formData).some((v) => !v) ||

@@ -5,7 +5,7 @@ export interface Expense {
   date: string;
   category?: string;
   budgetId?: number;
-  userId: number;
+  userId: string;
   CreatedAt: string;
   UpdatedAt: string;
   DeletedAt?: string | null;

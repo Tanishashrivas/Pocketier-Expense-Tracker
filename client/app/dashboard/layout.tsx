@@ -13,15 +13,15 @@ function DashboardLayout({ children }: { children: ReactNode }) {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
 
   useEffect(() => {
+    const checkUserBudgets = async (): Promise<void> => {
+      const response = await getBudgets();
+      if (response?.data?.length == 0) {
+        router.push("/dashboard/budgets");
+      }
+    };
+
     if (user) checkUserBudgets();
   }, [user]);
-
-  const checkUserBudgets = async () => {
-    const response = await getBudgets();
-    if (response?.data?.length == 0) {
-      router.push("/dashboard/budgets");
-    }
-  };
 
   const toggleSideNav = () => {
     setIsSideNavOpen(!isSideNavOpen);

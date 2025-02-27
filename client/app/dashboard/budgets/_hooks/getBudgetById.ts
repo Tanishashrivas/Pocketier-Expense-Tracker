@@ -1,6 +1,6 @@
 import axiosInstance from "@/app/utils/axiosInstance";
 
-export const getBudgetById = async (id: string) => {
+export const getBudgetById = async (id: number) => {
   try {
     const response = await axiosInstance.get(`/budgets/${id}`);
     return response;

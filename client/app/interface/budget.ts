@@ -6,7 +6,7 @@ export interface Budget {
   totalAmount: number;
   startDate: string;
   endDate: string;
-  userId: number;
+  userId: string;
   expenses: Expense[];
   CreatedAt: string;
   UpdatedAt: string;

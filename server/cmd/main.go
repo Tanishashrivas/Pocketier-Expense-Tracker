@@ -14,7 +14,7 @@ import (
 
 func main() {
 	if os.Getenv("RAILWAY_ENVIRONMENT") == "" && os.Getenv("RENDER") == "" {
-		_ = godotenv.Load()
+		_ = godotenv.Load(".env")
 	}
 
 	port := os.Getenv("PORT")
@@ -24,7 +24,7 @@ func main() {
 
 	db.Connect()
 	if db.DB == nil {
-		log.Fatal("Database connection failed")
+		log.Fatal("❌ Database connection failed")
 	}
 
 	r := gin.Default()
@@ -43,6 +43,6 @@ func main() {
 	routes.UserRoutes(api)
 
 	if err := r.Run("0.0.0.0:" + port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Fatalf("❌ Failed to start server: %v", err)
 	}
 }

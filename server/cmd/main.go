@@ -7,11 +7,16 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	db "github.com/tanishashrivas/pocketier-expense-tracker/server/config"
 	"github.com/tanishashrivas/pocketier-expense-tracker/server/internal/routes"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
 	port := os.Getenv("PORT")
 
 	if port == "" {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -13,6 +14,15 @@ import (
 )
 
 func main() {
+	// Force log output to appear on Render
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	// Debug: Print all environment variables
+	fmt.Println("🚀 Render Environment Variables:")
+	for _, e := range os.Environ() {
+		fmt.Println(e)
+	}
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 func main() {
-	if os.Getenv("RAILWAY_ENVIRONMENT") == "" {
+	if os.Getenv("RAILWAY_ENVIRONMENT") == "" && os.Getenv("RENDER") == "" {
 		_ = godotenv.Load()
 	}
 
@@ -22,6 +23,9 @@ func main() {
 	}
 
 	db.Connect()
+	if db.DB == nil {
+		log.Fatal("Database connection failed")
+	}
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -38,5 +42,7 @@ func main() {
 	routes.ExpenseRoutes(api)
 	routes.UserRoutes(api)
 
-	_ = r.Run("0.0.0.0:" + port)
+	if err := r.Run("0.0.0.0:" + port); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }

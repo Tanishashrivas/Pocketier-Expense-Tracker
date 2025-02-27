@@ -1,3 +1,18 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	db "github.com/tanishashrivas/pocketier-expense-tracker/server/config"
+	"github.com/tanishashrivas/pocketier-expense-tracker/server/internal/routes"
+)
+
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -22,10 +37,9 @@ func main() {
 
 	db.Connect()
 	if db.DB == nil {
-		log.Fatal("❌ Database connection failed")
+		log.Fatal("Database connection failed")
 	}
 
-	// Create router
 	r := gin.Default()
 
 	log.Println("🌍 Setting up routes...")

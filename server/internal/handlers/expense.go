@@ -10,9 +10,14 @@ import (
 )
 
 func GetAllExpenses(c *gin.Context) {
-	var expenseList []models.Expense
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
-	if err := config.DB.Find(&expenseList).Error; err != nil {
+	var expenseList []models.Expense
+	if err := config.DB.Where("user_id = ?", userID).Find(&expenseList).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve expenses"})
 		return
 	}
@@ -21,23 +26,22 @@ func GetAllExpenses(c *gin.Context) {
 }
 
 func CreateExpense(c *gin.Context) {
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var reqBody struct {
 		Description string  `json:"description"`
 		Amount      float64 `json:"amount"`
 		Date        string  `json:"date"`
 		Category    string  `json:"category"`
 		BudgetID    *uint   `json:"budgetId"`
-		UserID      string  `json:"userId"`
 	}
 
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
-
-	var user models.User
-	if err := config.DB.Where("clerk_id = ?", reqBody.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return
 	}
 
@@ -53,7 +57,7 @@ func CreateExpense(c *gin.Context) {
 		Date:        date,
 		Category:    reqBody.Category,
 		BudgetID:    reqBody.BudgetID,
-		UserID:      user.ID,
+		UserID:      userID.(uint),
 	}
 
 	if err := config.DB.Create(&newExpense).Error; err != nil {
@@ -65,15 +69,27 @@ func CreateExpense(c *gin.Context) {
 }
 
 func EditExpense(c *gin.Context) {
-	var updatedExpense models.Expense
-	id := c.Param("id")
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
+	id := c.Param("id")
+	var existingExpense models.Expense
+
+	if err := config.DB.Where("id = ? AND user_id = ?", id, userID).First(&existingExpense).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Expense not found or unauthorized"})
+		return
+	}
+
+	var updatedExpense models.Expense
 	if err := c.ShouldBindJSON(&updatedExpense); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := config.DB.Model(&models.Expense{}).Where("id=?", id).Updates(&updatedExpense).Error; err != nil {
+	if err := config.DB.Model(&existingExpense).Updates(updatedExpense).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update the expense"})
 		return
 	}
@@ -82,10 +98,21 @@ func EditExpense(c *gin.Context) {
 }
 
 func DeleteExpense(c *gin.Context) {
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	id := c.Param("id")
 	var expense models.Expense
 
-	if err := config.DB.Delete(&expense, id).Error; err != nil {
+	if err := config.DB.Where("id = ? AND user_id = ?", id, userID).First(&expense).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Expense not found or unauthorized"})
+		return
+	}
+
+	if err := config.DB.Delete(&expense).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete the expense"})
 		return
 	}

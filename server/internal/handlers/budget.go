@@ -10,9 +10,14 @@ import (
 )
 
 func GetAllBudgets(c *gin.Context) {
-	var budgetList []models.Budget
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
-	if err := config.DB.Find(&budgetList).Error; err != nil {
+	var budgetList []models.Budget
+	if err := config.DB.Where("user_id = ?", userID).Find(&budgetList).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve budgets"})
 		return
 	}
@@ -21,11 +26,17 @@ func GetAllBudgets(c *gin.Context) {
 }
 
 func GetBudgetById(c *gin.Context) {
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	id := c.Param("id")
 	var budget models.Budget
 
-	if err := config.DB.First(&budget, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve the budget"})
+	if err := config.DB.Where("id = ? AND user_id = ?", id, userID).First(&budget).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Budget not found"})
 		return
 	}
 
@@ -33,22 +44,21 @@ func GetBudgetById(c *gin.Context) {
 }
 
 func CreateBudget(c *gin.Context) {
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var reqBody struct {
 		Name        string  `json:"name"`
 		TotalAmount float64 `json:"totalAmount"`
 		StartDate   string  `json:"startDate"`
 		EndDate     string  `json:"endDate"`
-		UserID      string  `json:"userId"`
 	}
 
 	if err := c.ShouldBindJSON(&reqBody); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
-
-	var user models.User
-	if err := config.DB.Where("clerk_id = ?", reqBody.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
 		return
 	}
 
@@ -68,7 +78,7 @@ func CreateBudget(c *gin.Context) {
 		TotalAmount: reqBody.TotalAmount,
 		StartDate:   startDate,
 		EndDate:     endDate,
-		UserID:      user.ID,
+		UserID:      userID.(uint),
 	}
 
 	if err := config.DB.Create(&newBudget).Error; err != nil {
@@ -80,15 +90,21 @@ func CreateBudget(c *gin.Context) {
 }
 
 func EditBudget(c *gin.Context) {
-	var updatedBudget models.Budget
-	id := c.Param("id")
-
-	if err := c.ShouldBindJSON(&updatedBudget); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	if err := config.DB.Model(&models.Budget{}).Where("id=?", id).Updates(&updatedBudget).Error; err != nil {
+	id := c.Param("id")
+	var updatedBudget models.Budget
+
+	if err := c.ShouldBindJSON(&updatedBudget); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	if err := config.DB.Model(&models.Budget{}).Where("id = ? AND user_id = ?", id, userID).Updates(&updatedBudget).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update the budget"})
 		return
 	}
@@ -97,10 +113,15 @@ func EditBudget(c *gin.Context) {
 }
 
 func DeleteBudget(c *gin.Context) {
-	id := c.Param("id")
-	var budget models.Budget
+	userID, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 
-	if err := config.DB.Delete(&budget, id).Error; err != nil {
+	id := c.Param("id")
+
+	if err := config.DB.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Budget{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete the budget"})
 		return
 	}

@@ -13,7 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@clerk/nextjs";
 import EmojiPicker from "emoji-picker-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,7 +23,6 @@ export interface IBudgetPayload {
   totalAmount: number;
   startDate: string;
   endDate: string;
-  userId: string;
 }
 
 export interface IBudgetForm {
@@ -34,7 +32,6 @@ export interface IBudgetForm {
 }
 
 function CreateBudget({ refreshData }: { refreshData: () => void }) {
-  const { user } = useUser();
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [formData, setFormData] = useState<IBudgetForm>({
@@ -69,7 +66,6 @@ function CreateBudget({ refreshData }: { refreshData: () => void }) {
       endDate: formData.dateRange.to
         ? new Date(formData.dateRange.to).toISOString()
         : "",
-      userId: user!.id,
     };
 
     try {

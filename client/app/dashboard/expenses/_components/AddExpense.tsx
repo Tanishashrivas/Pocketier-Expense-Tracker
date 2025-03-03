@@ -13,7 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { createExpense } from "../_hooks/createExpense";
@@ -23,7 +22,6 @@ export interface IExpensePayload {
   category: string;
   amount: number;
   date: string;
-  userId: string;
   budgetId: number | null;
 }
 
@@ -40,7 +38,6 @@ interface IAddExpenseProps {
 }
 
 function AddExpense({ budgetId, refreshData }: IAddExpenseProps) {
-  const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<IExpenseForm>({
     description: "",
@@ -65,7 +62,6 @@ function AddExpense({ budgetId, refreshData }: IAddExpenseProps) {
       category: formData.category,
       amount: parseFloat(formData.amount),
       date: formData.date ? new Date(formData.date).toISOString() : "",
-      userId: user!.id,
       budgetId: budgetId || null,
     };
 

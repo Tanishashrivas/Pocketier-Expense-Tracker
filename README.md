@@ -5,7 +5,7 @@ Ever feel like you’re starring in **CSI: Wallet Edition** every time your part
 ---
 
 ## 🚀 Live Demo  
-👉 **Check it out here:** [Expense Tracker Demo](https://pocketier-expense-tracker.vercel.app)  
+👉 **Check it out here:** [Pocketier Expense Tracker](https://pocketier-expense-tracker.vercel.app)  
 
 > ⚠️ **Note:** The deployment may take some time to load initially because the backend is hosted on **Render**, which can take a while to spin up if inactive.  
 
